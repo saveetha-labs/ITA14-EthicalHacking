@@ -1,37 +1,36 @@
 # Ita14 Ethicalhacking
 
-Academic project and resource collection for Ita14 Ethicalhacking.
+Official repository for **Ita14 Ethicalhacking** coursework and technical implementations at Saveetha University.
 
-## 🚀 Features & Contents
-- This repository contains academic and technical project files for **Ita14 Ethicalhacking**.
-- Part of the **Saveetha Labs** open-source initiative.
+## 🚀 Repository Contents
+- A collection of academic resources and project documentation.
 
-## 🤝 How to Contribute
+## 🤝 Contribution Guidelines
 
-We welcome contributions from all students! Follow these steps to get started:
+This project is part of the **Saveetha Labs** open-source movement. We encourage students to contribute and help build a collaborative learning ecosystem.
 
-1. **Fork** this repository.
-2. **Clone** your fork locally:
+### Steps to Contribute:
+
+1. **Explore**: Browse through the existing labs and projects.
+2. **Fork**: Create your own copy of the repository by clicking the 'Fork' button.
+3. **Clone**: Download your fork to your local machine:
    ```bash
    git clone https://github.com/saveetha-labs/ITA14-EthicalHacking.git
    ```
-3. **Create a branch** for your improvements:
+4. **Develop**: Add new experiments, fix bugs, or improve documentation.
+5. **Commit**: Save your changes with a meaningful message:
    ```bash
-   git checkout -b feature/improvement
+   git commit -m "Add: Lab 10 Implementation"
    ```
-4. **Make your changes** and ensure they follow the project's quality standards.
-5. **Commit** your changes with a clear message:
+6. **Push**: Upload your changes to your GitHub fork:
    ```bash
-   git commit -m "Add: [Brief description of change]"
+   git push origin main
    ```
-6. **Push** to your fork:
-   ```bash
-   git push origin feature/improvement
-   ```
-7. **Open a Pull Request** to the `main` branch of this repository.
-
-## 🎓 Academic Integrity
-Please ensure that all contributions represent your own work and adhere to the academic integrity policies of Saveetha University.
+7. **Pull Request**: Submit a Pull Request to the original repository for review.
 
 ---
+
+### 🎓 Academic Integrity
+Please ensure that all contributions represent your own work and adhere to the academic integrity policies of Saveetha University. **Always redact personal identifying information (Names, Register Numbers) before submitting.**
+
 Built with ❤️ by students at **Saveetha Labs**.
