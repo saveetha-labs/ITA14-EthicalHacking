@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ITA14-EthicalHacking — Explorer</title>
+  <link rel="icon" type="image/png" href="https://saveetha-labs.github.io/saveetha-labs/favicon-32x32.png" />
+
+
+  <!-- Responsive, accessible UI + dark-mode aware -->
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: rgba(255, 255, 255, 0.85);
+      --border: rgba(226, 232, 240, 0.8);
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.1);
+      --text: #0f172a;
+      --radius: 16px;
+      --gap: 20px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --sidebar-w: 340px;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      --glass: saturate(180%) blur(12px);
+    }
+
+    [data-theme="dark"] {
+      --bg: #030712;
+      --card: rgba(17, 24, 39, 0.85);
+      --border: rgba(31, 41, 55, 0.8);
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --accent-soft: rgba(96, 165, 250, 0.15);
+      --text: #f1f5f9;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #030712;
+        --card: rgba(17, 24, 39, 0.85);
+        --border: rgba(31, 41, 55, 0.8);
+        --muted: #94a3b8;
+        --accent: #60a5fa;
+        --accent-soft: rgba(96, 165, 250, 0.15);
+        --text: #f1f5f9;
+        --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Light/Dark Background gradients */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: radial-gradient(circle at 0% 0%, var(--accent-soft) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, var(--accent-soft) 0%, transparent 50%);
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+      gap: var(--gap);
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Glass Effect */
+    .glass {
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      -webkit-backdrop-filter: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: 280px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-x: hidden;
+    }
+
+
+    .sidebar .header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    input[type="search"] {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="search"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* Tree */
+    .tree {
+      flex: 1;
+      overflow-y: auto;
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-right: 4px;
+    }
+
+    /* Custom Scrollbar */
+    .tree::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .tree::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
+
+    .node {
+      display: flex;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      gap: 10px;
+    }
+
+    .node:hover {
+      background: var(--accent-soft);
+    }
+
+    .node .name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .node .meta {
+      color: var(--muted);
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    /* Tree structure fixes */
+    .tree-item-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sub-tree {
+      margin-left: 20px;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+
+
+
+    /* Viewer */
+    .viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap);
+      min-width: 0;
+    }
+
+    .viewer .panel {
+      padding: 24px;
+    }
+
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .preview {
+      width: 100%;
+      height: 70vh;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    pre.code {
+      background: #0f172a !important;
+      color: #f8fafc !important;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Topbar */
+    .topbar {
+      display: none;
+      padding: 12px 20px;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 150;
+      background: var(--card);
+      backdrop-filter: var(--glass);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 90;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Responsive Controls */
+    @media (max-width: 1024px) {
+      :root {
+        --sidebar-w: 300px;
+      }
+
+      .app {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        display: flex;
+      }
+
+      .app {
+        padding: 12px;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        border-radius: 0;
+        transform: translateX(-100%);
+      }
+
+      .sidebar:not(.collapsed) {
+        transform: translateX(0);
+      }
+
+      .viewer {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .viewer .panel {
+        padding: 16px;
+      }
+
+      .crumbs {
+        font-size: 12px;
+      }
+
+      .viewer-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .action-link {
+        text-align: center;
+        background: var(--accent-soft);
+        border-radius: 8px;
+      }
+    }
+
+    /* Utils */
+    .action-link {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .action-link:hover {
+      background: var(--accent-soft);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+  <!-- Topbar (mobile) -->
+  <div class="topbar" id="topbar">
+    <button id="hamburger" class="btn" aria-label="Toggle menu">☰ Menu</button>
+    <div style="font-weight:700; font-size: 16px;">TOC Explorer</div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <main class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar glass" id="sidebar">
+      <div class="header">
+        <div>
+          <a href="../index.html" class="action-link" style="font-weight:700; color:var(--accent);">← Back to Hub</a><div class="title" style="margin-top:8px;">ITA14-EthicalHacking Explorer</div>
+          <div class="small">saveetha-labs / <strong>CSA13</strong></div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="controls-row">
+          <input id="search" type="search" placeholder="Filter files..." aria-label="Search">
+        </div>
+      </div>
+
+
+
+
+      <nav id="tree" class="tree"></nav>
+
+      <div style="display:flex; flex-direction:column; gap:4px; margin-top:16px;">
+        <a id="openRepo" class="action-link" href="#" target="_blank">GitHub Repository</a>
+        <a id="openPages" class="action-link" href="#" target="_blank">Live Pages</a>
+        <button id="themeToggleMobile" class="action-link"
+          style="text-align:left; border:none; background:none; cursor:pointer;">Switch Theme</button>
+      </div>
+
+      <div style="margin-top:auto; padding-top:16px;">
+        <button id="collapseBtn" class="btn btn-secondary" style="width:100%">Hide Sidebar</button>
+      </div>
+    </aside>
+
+    <!-- Viewer -->
+    <section class="viewer">
+      <div class="panel glass" style="display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding: 16px 24px;">
+        <div class="crumbs" id="crumbs">Select a file from the explorer</div>
+        <div class="viewer-actions" style="margin-left:auto; display:flex; gap:12px;">
+          <a id="openGithubLink" class="action-link hidden" href="#" target="_blank">GitHub View</a>
+          <a id="openRawLink" class="action-link hidden" href="#" target="_blank">Raw Code</a>
+          <button id="themeToggle" class="btn btn-secondary">Theme</button>
+        </div>
+      </div>
+
+      <div id="content" class="panel glass" style="min-height:500px; flex:1">
+        <div class="small" style="text-align:center; margin-top:100px; font-size:14px;">
+          <div style="font-size:40px; margin-bottom:12px;">📂</div>
+          Welcome to Theory of Computation Explorer.<br>Select a file to preview its content.
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+  <script>
+    // Configuration
+    const OWNER = 'saveetha-labs';
+    const REPO = 'ITA14-EthicalHacking';
+    const BRANCH = 'main';
+
+    // Cache Configuration
+    const CACHE_PREFIX = `gh_cache_${OWNER}_${REPO}_`;
+    const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+
+
+
+    const treeEl = document.getElementById('tree');
+    const contentEl = document.getElementById('content');
+    const crumbsEl = document.getElementById('crumbs');
+    const openRepo = document.getElementById('openRepo');
+    const openPages = document.getElementById('openPages');
+    const openGithubLink = document.getElementById('openGithubLink');
+    const openRawLink = document.getElementById('openRawLink');
+
+    openRepo.href = `https://github.com/${OWNER}/${REPO}`;
+    openPages.href = `https://${OWNER}.github.io/${REPO}/`;
+
+    // Update UI Labels
+    const displayTitle = REPO;
+    document.querySelector('.sidebar .header .title').textContent = displayTitle;
+    document.querySelector('.sidebar .header .small').innerHTML = `${OWNER} / <strong>${REPO}</strong>`;
+    document.querySelector('.topbar div').textContent = `${displayTitle} Explorer`;
+
+
+    document.getElementById('openPages').href = openPages.href;
+
+
+    // Helpers
+    const contentsUrl = (path = '') => `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURIComponent(path)}?ref=${BRANCH}`;
+    const htmlUrl = (path = '') => `https://github.com/${OWNER}/${REPO}/blob/${BRANCH}/${path}`;
+    const rawUrl = (path = '') => `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${path}`;
+
+    // Cache Helpers
+    const cache = {
+      get: (key) => {
+        try {
+          const item = localStorage.getItem(CACHE_PREFIX + key);
+          if (!item) return null;
+          const { value, timestamp } = JSON.parse(item);
+          if (Date.now() - timestamp > CACHE_TTL) {
+            localStorage.removeItem(CACHE_PREFIX + key);
+            return null;
+          }
+          return value;
+        } catch (e) { return null; }
+      },
+      set: (key, value) => {
+        try {
+          const item = JSON.stringify({ value, timestamp: Date.now() });
+          localStorage.setItem(CACHE_PREFIX + key, item);
+        } catch (e) { console.warn('Cache set failed', e); }
+      },
+      clear: () => {
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith(CACHE_PREFIX)) localStorage.removeItem(k);
+        });
+      }
+    };
+
+    // Small debounce util
+
+    function debounce(fn, wait = 220) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); } }
+
+    // Load root directory and build list
+    async function fetchDir(path = '') {
+      const cached = cache.get('dir_' + path);
+      if (cached) return cached;
+
+      const res = await fetch(contentsUrl(path));
+      if (!res.ok) {
+        throw new Error(`GitHub API ${res.status} ${res.statusText}`);
+      }
+      const data = await res.json();
+      cache.set('dir_' + path, data);
+      return data;
+    }
+
+
+    // Reliable tree rendering
+    function renderNode(entry) {
+      const itemContainer = document.createElement('div');
+      itemContainer.className = 'tree-item-container';
+
+      const row = document.createElement('div');
+      row.className = 'node';
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.justifyContent = 'space-between';
+      row.style.width = '100%';
+
+      const left = document.createElement('div');
+      left.style.display = 'flex';
+      left.style.alignItems = 'center';
+      left.style.gap = '8px';
+      left.style.minWidth = '0';
+      left.style.flex = '1';
+
+      const icon = document.createElement('span');
+      icon.textContent = entry.type === 'dir' ? '📁' : '📄';
+      icon.style.flexShrink = '0';
+
+      const nameLabel = document.createElement('div');
+      nameLabel.className = 'name';
+      nameLabel.textContent = entry.name;
+      nameLabel.style.overflow = 'hidden';
+      nameLabel.style.textOverflow = 'ellipsis';
+      nameLabel.style.whiteSpace = 'nowrap';
+
+      left.appendChild(icon);
+      left.appendChild(nameLabel);
+
+      const right = document.createElement('div');
+      right.style.display = 'flex';
+      right.style.alignItems = 'center';
+      right.style.gap = '8px';
+      right.style.flexShrink = '0';
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = entry.type === 'dir' ? '' : humanSize(entry.size || 0);
+
+      const gh = document.createElement('a');
+      gh.href = entry.html_url || htmlUrl(entry.path);
+      gh.target = '_blank';
+      gh.className = 'action-link small';
+      gh.textContent = 'GH';
+      gh.style.padding = '2px 4px';
+      gh.addEventListener('click', (e) => e.stopPropagation());
+
+      right.appendChild(meta);
+      right.appendChild(gh);
+
+      row.appendChild(left);
+      row.appendChild(right);
+      itemContainer.appendChild(row);
+
+      if (entry.type === 'dir') {
+        row.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleDir(itemContainer, entry.path);
+        });
+      } else {
+        row.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openFile(entry);
+        });
+      }
+
+      return itemContainer;
+    }
+
+    async function toggleDir(container, path) {
+      if (container._expanded) {
+        container._expanded = false;
+        if (container._sub) container.removeChild(container._sub);
+      } else {
+        // Record visual position relative to parent to prevent jumps
+        const treeRect = treeEl.getBoundingClientRect();
+        const beforeRect = container.getBoundingClientRect();
+        const relativeTop = beforeRect.top - treeRect.top;
+
+        // Accordion: Collapse other expanded folders (that aren't parents)
+        const others = document.querySelectorAll('.tree-item-container');
+        others.forEach(c => {
+          if (c !== container && c._expanded && !c.contains(container)) {
+            c._expanded = false;
+            if (c._sub) c.removeChild(c._sub);
+          }
+        });
+
+        // Restore Position: compensate for collapsed height above
+        const afterRect = container.getBoundingClientRect();
+        const diff = afterRect.top - treeRect.top - relativeTop;
+        treeEl.scrollTop += diff;
+
+        container._expanded = true;
+        const sub = document.createElement('div');
+        sub.className = 'sub-tree';
+        sub.innerHTML = '<div class="small muted" style="padding: 4px 12px; border-left: none;">Loading...</div>';
+        container.appendChild(sub);
+        container._sub = sub;
+
+        try {
+          const data = await fetchDir(path);
+          data.sort((a, b) => (a.type === b.type) ? a.name.localeCompare(b.name) : (a.type === 'dir' ? -1 : 1));
+          sub.innerHTML = '';
+          data.forEach(item => sub.appendChild(renderNode(item)));
+        } catch (err) {
+          sub.innerHTML = `<div class="small" style="color:red; padding: 4px 12px; border-left: none;">Failed</div>`;
+        }
+      }
+    }
+
+
+
+
+
+
+
+
+
+    // Open a file and preview
+    async function openFile(entry) {
+      if (window.innerWidth <= 860) {
+        sidebar.classList.add('collapsed');
+        overlay.classList.remove('active');
+      }
+      crumbsEl.textContent = entry.path;
+
+      openGithubLink.href = entry.html_url || htmlUrl(entry.path); openGithubLink.classList.remove('hidden');
+      openRawLink.href = rawUrl(entry.path); openRawLink.classList.remove('hidden');
+
+      contentEl.innerHTML = `<div class="small muted">Loading <span class="small muted">(${entry.name})</span></div>`;
+
+      const ext = (entry.name.split('.').pop() || '').toLowerCase();
+
+      try {
+        // Images
+        if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'].includes(ext)) {
+          contentEl.innerHTML = `<img class="preview" alt="${entry.name}" src="${rawUrl(entry.path)}">`;
+          return;
+        }
+
+        // PDF
+        if (ext === 'pdf') {
+          contentEl.innerHTML = `<iframe class="preview" src="${rawUrl(entry.path)}" title="${entry.name}"></iframe>`;
+          return;
+        }
+
+        // Office (use Office Online viewer)
+        if (['docx', 'xlsx', 'pptx'].includes(ext)) {
+          const office = 'https://view.officeapps.live.com/op/view.aspx?src=' + encodeURIComponent(rawUrl(entry.path));
+          contentEl.innerHTML = `<iframe class="preview" src="${office}" title="${entry.name}"></iframe>`;
+          return;
+        }
+
+        // Markdown
+        if (['md', 'markdown'].includes(ext) || /readme/i.test(entry.name)) {
+          try {
+            const cacheKey = 'file_' + entry.path;
+            const cachedTxt = cache.get(cacheKey);
+            const txt = cachedTxt || await (await fetch(rawUrl(entry.path))).text();
+            if (!cachedTxt) cache.set(cacheKey, txt);
+
+            let html = '';
+            if (typeof marked !== 'undefined') {
+
+              // Support both old and new marked versions
+              html = (typeof marked.parse === 'function') ? marked.parse(txt || '') : marked(txt || '');
+            } else {
+              // Fallback to plain text if library fails to load
+              const escaped = (txt || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              html = `<pre style="white-space:pre-wrap; font-family:var(--mono); padding:10px; border-radius:8px; background:rgba(0,0,0,0.03);">${escaped}</pre>`;
+            }
+            contentEl.innerHTML = `<article style="background:transparent;"><div style="padding:6px 8px;border-radius:6px;background:transparent;">${html}</div></article>`;
+            if (typeof Prism !== 'undefined') Prism.highlightAll();
+          } catch (err) {
+            contentEl.innerHTML = `<div class="small" style="color:#c94">Failed to load content: ${err.message}</div>`;
+          }
+          return;
+        }
+
+
+
+        // HTML/HTM — sandboxed iframe
+        if (ext === 'html' || ext === 'htm') {
+          contentEl.innerHTML = `<iframe class="preview" sandbox="allow-same-origin allow-scripts" src="${rawUrl(entry.path)}" title="${entry.name}"></iframe>`;
+          return;
+        }
+
+        // Text / source
+        const textTypes = ['txt', 'js', 'ts', 'json', 'py', 'java', 'c', 'cpp', 'css', 'scss', 'html', 'csv', 'yml', 'yaml', 'sh', 'bat', 'tex', 'md', 'kt', 'cs', 'go', 'rb', 'php', 'sql', 'r', 'swift', 'm', 'h'];
+        if (textTypes.includes(ext) || entry.size < 300000) {
+          const cacheKey = 'file_' + entry.path;
+          const cached = cache.get(cacheKey);
+          const txt = cached || await (await fetch(rawUrl(entry.path))).text();
+          if (!cached) cache.set(cacheKey, txt);
+
+          // escape
+
+          const esc = txt.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          contentEl.innerHTML = `<pre class="code"><code class="language-none">${esc}</code></pre>`;
+          if (typeof Prism !== 'undefined') Prism.highlightAll();
+          return;
+        }
+
+
+
+        // Fallback
+        contentEl.innerHTML = `<div class="small muted">Preview not available. <a href="${rawUrl(entry.path)}" target="_blank" rel="noopener">Open raw</a> · <a href="${entry.html_url || htmlUrl(entry.path)}" target="_blank" rel="noopener">Open on GitHub</a></div>`;
+      } catch (err) {
+        contentEl.innerHTML = `<div class="small" style="color:#c94">Failed to load file: ${err.message}</div>`;
+      }
+    }
+
+    // Pretty file size
+    function humanSize(sz) {
+      if (!sz) return '';
+      const units = ['B', 'KB', 'MB', 'GB'];
+      let i = 0; let n = sz;
+      while (n >= 1024 && i < units.length - 1) { n /= 1024; i++; }
+      return n.toFixed(n < 10 && i > 0 ? 1 : 0) + ' ' + units[i];
+    }
+
+    // Render root directory initially
+    async function renderRoot() {
+      treeEl.innerHTML = `<div class="small muted">Loading repository contents…</div>`;
+      try {
+        const data = await fetchDir('');
+        data.sort((a, b) => (a.type === b.type) ? a.name.localeCompare(b.name) : (a.type === 'dir' ? -1 : 1));
+        treeEl.innerHTML = '';
+        for (const e of data) { treeEl.appendChild(renderNode(e)); }
+        // auto-open README if present
+        const readme = data.find(d => /readme/i.test(d.name));
+        if (readme && readme.type === 'file') openFile(readme);
+      } catch (err) {
+        treeEl.innerHTML = `<div class="small" style="color:#c94">Failed to load repository: ${err.message}</div>`;
+      }
+    }
+
+    // Search/filter
+    const searchEl = document.getElementById('search');
+    const applyFilter = debounce(() => {
+      const q = (searchEl.value || '').toLowerCase().trim();
+      const nodes = treeEl.querySelectorAll('.node');
+      nodes.forEach(n => {
+        const name = n.querySelector('.name')?.textContent?.toLowerCase() || '';
+        n.style.display = (!q || name.includes(q)) ? '' : 'none';
+      });
+    }, 160);
+    searchEl.addEventListener('input', applyFilter);
+
+    // Sidebar / mobile controls
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const collapseBtn = document.getElementById('collapseBtn');
+    const hamburger = document.getElementById('hamburger');
+
+    function toggleSidebar() {
+      const isVisible = !sidebar.classList.contains('collapsed');
+
+      if (isVisible) {
+        sidebar.classList.add('collapsed');
+        overlay.classList.remove('active');
+      } else {
+        sidebar.classList.remove('collapsed');
+        if (window.innerWidth <= 860) {
+          overlay.classList.add('active');
+        }
+      }
+    }
+
+    collapseBtn.addEventListener('click', toggleSidebar);
+    hamburger.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+
+
+
+    // Theme toggle
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const theme = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('site-theme', theme);
+    }
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    document.getElementById('themeToggleMobile').addEventListener('click', toggleTheme);
+
+
+
+
+
+    // keyboard focus: close sidebar on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        sidebar.classList.add('collapsed');
+        overlay.classList.remove('active');
+      }
+    });
+
+    // initialize theme from storage or prefers-color-scheme
+    (function initTheme() {
+      const t = localStorage.getItem('site-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+
+    // Boot: Wait for libraries or retry
+    async function boot() {
+      let retries = 0;
+      const maxRetries = 40; // 4 seconds - be generous for slow networks
+      while ((typeof marked === 'undefined' || typeof Prism === 'undefined') && retries < maxRetries) {
+        await new Promise(r => setTimeout(r, 100));
+        retries++;
+      }
+      renderRoot();
+    }
+
+    boot();
+
+
+
+
+  </script>
+</body>
+
+</html>
